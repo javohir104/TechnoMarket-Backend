@@ -183,3 +183,47 @@ test("CORS: ruxsat berilmagan origin uchun CORS header yo'q", async () => {
   const res = await ctx.api.get("/products").set("Origin", "https://evil-site.com");
   assert.equal(res.headers["access-control-allow-origin"], undefined);
 });
+
+test("Diagnostika: admin /admin/diagnostics/db-status ni o'qiysi mumkin", async () => {
+  const res = await ctx.asAdmin(ctx.api.get("/admin/diagnostics/db-status"));
+  assert.equal(res.status, 200);
+  assert.equal(typeof res.body.database, "string");
+  assert.equal(res.body.database, "tm_test");
+  assert.equal(typeof res.body.collection, "string");
+  assert.equal(res.body.collection, "products");
+  assert.equal(typeof res.body.totalProducts, "number");
+  assert.equal(typeof res.body.activeProducts, "number");
+  assert.equal(typeof res.body.apiVisibleProducts, "number");
+  assert.ok(res.body.apiVisibleProducts <= res.body.activeProducts);
+  assert.ok(res.body.activeProducts <= res.body.totalProducts);
+});
+
+test("Diagnostika: juvridagi ma'lumotlar (URI, parol, token) qaytarilmaydi", async () => {
+  const res = await ctx.asAdmin(ctx.api.get("/admin/diagnostics/db-status"));
+  assert.equal(res.status, 200);
+  const body = JSON.stringify(res.body);
+  assert.equal(body.includes("MONGODB_URI"), false);
+  assert.equal(body.includes("mongodb+srv"), false);
+  assert.equal(body.includes("password"), false);
+  assert.equal(body.includes("token"), false);
+  assert.equal(body.includes("secret"), false);
+});
+
+test("Diagnostika: oddiy foydalanuvchi 403 olishi kerak", async () => {
+  const res = await ctx.api.get("/admin/diagnostics/db-status").set("Authorization", `Bearer ${ctx.userToken}`);
+  assert.equal(res.status, 403);
+});
+
+test("Diagnostika: autentifikatsiya bo'lmagan 401 olishi kerak", async () => {
+  const res = await ctx.api.get("/admin/diagnostics/db-status");
+  assert.equal(res.status, 401);
+});
+
+test("Diagnostika: so'rovdan keyin ma'lumotlar o'zgarmaydi (read-only)", async () => {
+  const before = await ctx.asAdmin(ctx.api.get("/admin/diagnostics/db-status"));
+  await ctx.asAdmin(ctx.api.get("/admin/diagnostics/db-status"));
+  const after = await ctx.asAdmin(ctx.api.get("/admin/diagnostics/db-status"));
+  assert.equal(before.body.totalProducts, after.body.totalProducts);
+  assert.equal(before.body.activeProducts, after.body.activeProducts);
+  assert.equal(before.body.apiVisibleProducts, after.body.apiVisibleProducts);
+});

@@ -58,6 +58,7 @@ function createApp() {
 
   app.use("/admin", limiter(60 * 1000, 200, "So'rovlar juda ko'p."), requireAdmin);
   app.use("/admin/products", require("./routes/admin/products"));
+app.use("/admin/diagnostics", require("./routes/admin/diagnostics"));
   app.use("/admin/categories", require("./routes/admin/categories"));
   app.use("/admin/orders", require("./routes/admin/orders"));
   app.use("/admin/finance", require("./routes/admin/finance"));
