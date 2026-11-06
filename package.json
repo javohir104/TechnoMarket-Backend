@@ -1,0 +1,36 @@
+{
+  "name": "telefon-market-api",
+  "version": "1.0.0",
+  "description": "Telefon Market marketplace API (backend)",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node --test --test-concurrency=1 \"tests/*.test.js\"",
+    "check": "node src/scripts/check.js",
+    "make-admin": "node src/scripts/makeAdmin.js",
+    "seed:products": "node src/scripts/seedProducts.js",
+    "clear-demo": "node src/scripts/clearDemo.js",
+    "migrate": "node src/scripts/migrate.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^8.7.1",
+    "google-auth-library": "^11.3.2",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.6.0",
+    "multer": "^2.4.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "supertest": "^7.3.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
