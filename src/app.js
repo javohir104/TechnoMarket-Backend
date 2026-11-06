@@ -27,7 +27,11 @@ function createApp() {
         if (!origin || config.clientOrigins.includes(origin)) return cb(null, true);
         return cb(null, false);
       },
+      credentials: true,
+      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
       exposedHeaders: ["X-Total-Count", "X-Total-Pages"],
+      optionsSuccessStatus: 204,
     })
   );
   app.use(express.json({ limit: "100kb" }));

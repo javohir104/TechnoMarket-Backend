@@ -149,3 +149,37 @@ test("buyurtmada qatnashgan mahsulot o'chirilmaydi, arxivlanadi", async () => {
   assert.equal(res.body.archived, true);
   assert.equal((await ctx.api.get("/products")).body.some((x) => x.name === p.name), false);
 });
+
+test("CORS: ruxsat berilgan origin uchun Access-Control-Allow-Origin header bor", async () => {
+  const res = await ctx.api.get("/products").set("Origin", "http://localhost:5173");
+  assert.equal(res.status, 200);
+  assert.equal(res.headers["access-control-allow-origin"], "http://localhost:5173");
+});
+
+test("CORS: credentials header true", async () => {
+  const res = await ctx.api.get("/products").set("Origin", "http://localhost:5173");
+  assert.equal(res.headers["access-control-allow-credentials"], "true");
+});
+
+test("CORS: preflight OPTIONS 204 qaytaradi va metodlar ko'rsatiladi", async () => {
+  const res = await ctx.api.options("/products")
+    .set("Origin", "http://localhost:5173")
+    .set("Access-Control-Request-Method", "POST")
+    .set("Access-Control-Request-Headers", "Content-Type, Authorization");
+  assert.equal(res.status, 204);
+  assert.equal(res.headers["access-control-allow-origin"], "http://localhost:5173");
+  assert.ok(res.headers["access-control-allow-methods"].includes("POST"));
+  const allowHeaders = (res.headers["access-control-allow-headers"] || "").toLowerCase();
+  assert.ok(allowHeaders.includes("authorization"));
+});
+
+test("CORS: Vercel domeni ruxsat etilgan", async () => {
+  const res = await ctx.api.get("/products").set("Origin", "https://techno-market-fawn.vercel.app");
+  assert.equal(res.status, 200);
+  assert.equal(res.headers["access-control-allow-origin"], "https://techno-market-fawn.vercel.app");
+});
+
+test("CORS: ruxsat berilmagan origin uchun CORS header yo'q", async () => {
+  const res = await ctx.api.get("/products").set("Origin", "https://evil-site.com");
+  assert.equal(res.headers["access-control-allow-origin"], undefined);
+});
