@@ -25,7 +25,7 @@ function numberParam(value, name) {
 // Javob: mahsulotlar massivi. Jami soni — X-Total-Count sarlavhasida.
 router.get("/", asyncHandler(async (req, res) => {
   const { q, type, condition, brand, storage, color, category, inStock, sort } = req.query;
-  const filter = { isActive: true };
+  const filter = { isActive: true, isDemo: false };
 
   if (str(q)) {
     const rx = { $regex: escapeRegex(str(q).slice(0, 80)), $options: "i" };
@@ -64,7 +64,7 @@ router.get("/", asyncHandler(async (req, res) => {
 
 // Filtr uchun mavjud qiymatlar
 router.get("/meta", asyncHandler(async (_req, res) => {
-  const base = { isActive: true };
+  const base = { isActive: true, isDemo: false };
   const [brands, storages, colors] = await Promise.all([
     Product.distinct("brand", base),
     Product.distinct("storage", base),
