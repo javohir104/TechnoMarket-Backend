@@ -2,6 +2,7 @@
 const { config, assertConfig } = require("./config");
 const { connectDB } = require("./db");
 const { createApp } = require("./app");
+const { runProductDiagnostics } = require("./utils/productDiagnostics");
 
 async function main() {
   assertConfig();
@@ -15,6 +16,9 @@ async function main() {
   try {
     await connectDB();
     console.log("MongoDB muvaffaqiyatli ulandi");
+    await runProductDiagnostics(config).catch((err) => {
+      console.error("Diagnostika xatosi:", err.message);
+    });
   } catch (err) {
     console.error("MongoDB ulanish xatosi:", err);
     server.close(() => process.exit(1));
